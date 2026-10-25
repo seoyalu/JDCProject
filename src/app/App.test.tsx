@@ -1,11 +1,11 @@
-// @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { App } from "./App";
 import { CampusProvider } from "./state/CampusContext";
 import { STORAGE_KEY } from "./state/campus";
+// @vitest-environment jsdom
+import userEvent from "@testing-library/user-event";
 
 function mount(path = "/") {
   return render(

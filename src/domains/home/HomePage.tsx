@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { BookOpen } from "lucide-react";
-import { ChevronRight } from "lucide-react";
-import { GraduationCap } from "lucide-react";
-import { MapPin } from "lucide-react";
-import { ShieldCheck } from "lucide-react";
-import { ShoppingBag } from "lucide-react";
-import { Sparkles } from "lucide-react";
-import { Stamp } from "lucide-react";
-import { Ticket } from "lucide-react";
-import { Wallet } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  ChevronRight,
+  GraduationCap,
+  MapPin,
+  ShieldCheck,
+  ShoppingBag,
+  Sparkles,
+  Stamp,
+  Ticket,
+  Wallet,
+} from "lucide-react";
 import { missions } from "../missions/catalog";
 import { useCampus } from "../../app/state/CampusContext";
 import { MissionCard } from "../missions/MissionCard";

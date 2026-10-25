@@ -1,7 +1,4 @@
-import { Citrus } from "lucide-react";
-import { Leaf } from "lucide-react";
-import { Megaphone } from "lucide-react";
-import { Store } from "lucide-react";
+import { Citrus, Leaf, Megaphone, Store } from "lucide-react";
 import type { MissionKind } from "./catalog";
 
 export function MissionIcon({

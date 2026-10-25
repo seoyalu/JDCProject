@@ -1,17 +1,14 @@
-import { useEffect } from "react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { NavLink } from "react-router-dom";
-import { Route } from "react-router-dom";
-import { Routes } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { Bell } from "lucide-react";
-import { Compass } from "lucide-react";
-import { Gift } from "lucide-react";
-import { Home } from "lucide-react";
-import { UserRound } from "lucide-react";
-import { Waves } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import {
+  ArrowRight,
+  Bell,
+  Compass,
+  Gift,
+  Home,
+  UserRound,
+  Waves,
+} from "lucide-react";
 import { useCampus } from "./state/CampusContext";
 import { Modal } from "../shared/ui/Modal";
 import { CampusHome } from "../domains/home/HomePage";
@@ -21,6 +18,7 @@ import { Benefits } from "../domains/benefits/BenefitsPage";
 import { Pass } from "../domains/pass/PassPage";
 import { MyCampus } from "../domains/profile/MyCampusPage";
 import { NotFound } from "../shared/ui/NotFound";
+import { Missions } from "../domains/missions/MissionsPage";
 import s from "../styles/App.module.css";
 
 const nav = [
@@ -140,4 +138,3 @@ export function App() {
     </>
   );
 }
-import { Missions } from "../domains/missions/MissionsPage";

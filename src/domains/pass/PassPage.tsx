@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { BookOpen } from "lucide-react";
-import { CheckCircle2 } from "lucide-react";
-import { ChevronRight } from "lucide-react";
-import { ShieldCheck } from "lucide-react";
+import {
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  ChevronRight,
+  ShieldCheck,
+} from "lucide-react";
 import { missions } from "../missions/catalog";
 import { useCampus } from "../../app/state/CampusContext";
 import { MissionIcon } from "../missions/MissionIcon";

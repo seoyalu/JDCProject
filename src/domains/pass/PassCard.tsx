@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
-import { ShieldCheck } from "lucide-react";
-import { Waves } from "lucide-react";
+import { ArrowUpRight, ShieldCheck, Waves } from "lucide-react";
 import { useCampus } from "../../app/state/CampusContext";
 import { number } from "../../shared/lib/format";
-import { ArrowUpRight } from "lucide-react";
 import s from "../../styles/App.module.css";
 
 export function PassCard({ compact = false }: { compact?: boolean }) {

@@ -7,10 +7,10 @@ import {
 } from "react";
 import type { Dispatch, ReactNode } from "react";
 import {
+  STORAGE_KEY,
   campusReducer,
   initialState,
   restoreState,
-  STORAGE_KEY,
 } from "./campus";
 import type { CampusAction, CampusState } from "./campus";
 

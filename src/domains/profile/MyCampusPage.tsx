@@ -1,21 +1,20 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { ChevronRight } from "lucide-react";
-import { RotateCcw } from "lucide-react";
-import { ShieldCheck } from "lucide-react";
-import { Ticket } from "lucide-react";
-import { Wallet } from "lucide-react";
-import { Waves } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  ArrowRight,
+  ChevronRight,
+  RotateCcw,
+  ShieldCheck,
+  Ticket,
+  Wallet,
+  Waves,
+} from "lucide-react";
 import { missions } from "../missions/catalog";
 import { useCampus } from "../../app/state/CampusContext";
-import { date } from "../../shared/lib/format";
+import { date, number } from "../../shared/lib/format";
 import { Empty } from "../../shared/ui/Empty";
 import { MissionCard } from "../missions/MissionCard";
 import { Modal } from "../../shared/ui/Modal";
-import { number } from "../../shared/lib/format";
 import { PageHeading } from "../../shared/ui/PageHeading";
 import s from "../../styles/App.module.css";
 

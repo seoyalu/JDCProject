@@ -1,6 +1,4 @@
-import { useEffect } from "react";
-import { useRef } from "react";
-import { useId } from "react";
+import { useEffect, useId, useRef } from "react";
 import type { ReactNode } from "react";
 import { X } from "lucide-react";
 import s from "../../styles/App.module.css";

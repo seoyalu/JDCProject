@@ -1,19 +1,18 @@
-import { useRef } from "react";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { CheckCircle2 } from "lucide-react";
-import { ShoppingBag } from "lucide-react";
-import { Ticket } from "lucide-react";
-import { Wallet } from "lucide-react";
+import { useRef, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import {
+  ArrowRight,
+  CheckCircle2,
+  ShoppingBag,
+  Ticket,
+  Wallet,
+} from "lucide-react";
 import { rewards } from "./catalog";
 import type { Reward } from "./catalog";
 import { useCampus } from "../../app/state/CampusContext";
-import { date } from "../../shared/lib/format";
+import { date, number } from "../../shared/lib/format";
 import { Empty } from "../../shared/ui/Empty";
 import { Modal } from "../../shared/ui/Modal";
-import { number } from "../../shared/lib/format";
 import { SectionTitle } from "../../shared/ui/SectionTitle";
 import { PageHeading } from "../../shared/ui/PageHeading";
 import s from "../../styles/App.module.css";

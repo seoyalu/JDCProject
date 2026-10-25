@@ -1,9 +1,5 @@
-import { Link } from "react-router-dom";
-import { useParams } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { Check } from "lucide-react";
-import { ChevronRight } from "lucide-react";
-import { Stamp } from "lucide-react";
+import { Link, useParams } from "react-router-dom";
+import { ArrowRight, Check, ChevronRight, Stamp } from "lucide-react";
 import { missions } from "./catalog";
 import { useCampus } from "../../app/state/CampusContext";
 import { MissionIcon } from "./MissionIcon";

@@ -1,19 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { useParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
-import { ArrowRight } from "lucide-react";
-import { Check } from "lucide-react";
-import { CheckCircle2 } from "lucide-react";
-import { Clock3 } from "lucide-react";
-import { MapPin } from "lucide-react";
-import { QrCode } from "lucide-react";
-import { Sparkles } from "lucide-react";
-import { Stamp } from "lucide-react";
-import { Wallet } from "lucide-react";
-import { missions } from "./catalog";
-import { voteOptions } from "./catalog";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  Clock3,
+  MapPin,
+  QrCode,
+  Sparkles,
+  Stamp,
+  Wallet,
+} from "lucide-react";
+import { missions, voteOptions } from "./catalog";
 import { useCampus } from "../../app/state/CampusContext";
 import { MissionIcon } from "./MissionIcon";
 import { Modal } from "../../shared/ui/Modal";
