@@ -4,7 +4,7 @@
 
 ## 실행
 
-Node.js 22.12 이상과 pnpm을 사용합니다.
+Node.js 24.22.1 이상과 pnpm을 사용합니다.
 
 ```sh
 pnpm install
@@ -31,17 +31,20 @@ pnpm preview
 
 ```text
 src/
-  App.tsx                    화면과 경로
-  main.tsx                   앱 진입점
-  components/UI.tsx          PASS, 미션 카드, 접근성 모달 등 공통 UI
-  data/catalog.ts            미션과 쿠폰 데이터
-  state/campus.ts            상태 모델, 리듀서, 저장 데이터 검증
-  state/CampusContext.tsx    공통 상태와 브라우저 저장
-  state/campus.test.ts       보상 흐름 테스트
-  styles/global.css         공통 스타일과 디자인 변수
-  styles/App.module.css     화면별 반응형 스타일
-public/images/               제주 배너 이미지
-vercel.json                 Vite 배포 및 SPA 경로 설정
+  app/                      앱 경로, 공통 상태, 화면 통합 테스트
+    state/                  보상 원장, 저장 검증, Context
+  domains/
+    home/                   홈 대시보드
+    missions/               미션 목록·상세·완료, 데이터와 카드
+    benefits/               쿠폰 교환·사용, 혜택 데이터
+    pass/                   대학생 PASS와 스탬프 여권
+    profile/                내 활동, 포인트 내역, 초기화
+  shared/
+    ui/                     모달, 빈 화면, 제목 등 공통 UI
+    lib/                    숫자·날짜 표시
+  styles/                   공통 디자인 변수와 반응형 스타일
+public/images/              제주 배너 이미지
+.github/workflows/ci.yml    푸시·PR 자동 검증
 ```
 
 ## 발표 시나리오
@@ -73,3 +76,16 @@ Vercel에서 프로젝트를 가져와 Vite 프레임워크를 선택합니다. 
 참고 이미지의 하늘색, JDC 블루, 귤색 포인트, 둥근 카드와 제주 캐릭터 분위기를 반영했습니다. `public/images/jeju-campus.webp`는 실제 화면에 사용되는 최적화 이미지이며 PNG 원본도 함께 보관했습니다. 이미지 생성 도구와 사용 프롬프트는 `문서/디자인_에셋.md`에 기록되어 있습니다.
 
 폰트는 Google Fonts의 Noto Sans KR을 요청하고, 연결할 수 없으면 시스템 한글 폰트로 표시합니다. 배너 이미지는 프로젝트에 포함되어 있습니다.
+
+## 개발 및 검증 규칙
+
+도메인 폴더는 기능별 소스 패키지입니다. 단일 앱이므로 별도 npm 패키지로 나누지 않습니다. 도메인 데이터는 각 도메인에 두고, 여러 도메인을 함께 갱신하는 보상 거래와 저장은 app/state에서 관리합니다. shared에는 도메인 데이터에 의존하지 않는 공통 UI와 유틸리티를 둡니다.
+
+- `pnpm format`: 코드 형식 정리
+- `pnpm check`: 코드 형식, 모든 테스트, 배포 빌드 확인
+- GitHub의 푸시와 PR에서 같은 검증을 자동 실행합니다.
+- 저장 복원 시 포인트와 미션·쿠폰 원장을 대조하고 손상된 데이터는 초기화합니다. 서버의 보안 검증을 대체하지 않습니다.
+- 쿠폰은 발급 시각 이상, 만료 시각 미만에서 1회 사용할 수 있습니다.
+- 웰컴 300P와 전체 미션 600P로 최대 900P를 적립합니다. 10% 할인 쿠폰은 단독으로 체험 가능하도록 800P로 설정했습니다. 모든 쿠폰을 한 번에 교환할 수 있는 것은 아닙니다.
+
+테스트는 보상 규칙, 저장 데이터 손상, 미션 인증·투표, 쿠폰 교환·사용·재접속, 모달 닫기와 포커스 복귀, 잘못된 주소, 저장 차단을 검증합니다. 화면 테스트는 jsdom 환경이며 실제 브라우저의 시각적 배치까지 검증하지는 않습니다.
