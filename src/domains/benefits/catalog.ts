@@ -29,7 +29,7 @@ export const rewards: Reward[] = [
     title: "10% 할인 쿠폰",
     headline: "10%",
     detail: "차곡차곡 모은 나를 위한 선물",
-    points: 1000,
+    points: 800,
     theme: "green",
   },
 ];
