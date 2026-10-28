@@ -1,6 +1,12 @@
 import { useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Gift, Ticket, Truck } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Gift,
+  Ticket,
+  Snowflake,
+} from "lucide-react";
 import { rewards } from "./catalog";
 import type { Reward } from "./catalog";
 import { useCampus } from "../../app/state/CampusContext";
@@ -30,8 +36,7 @@ export function Benefits() {
       Date.parse(c.expiresAt) > Date.parse(now) &&
       Date.parse(c.issuedAt) <= Date.parse(now),
   ).length;
-  const visible =
-    filter === "쿠폰" ? rewards.filter((r) => r.id !== "shipping") : rewards;
+  const visible = rewards;
   function exchange() {
     if (
       !selected ||
@@ -115,7 +120,7 @@ export function Benefits() {
               <button key={r.id} onClick={() => open(r)}>
                 <span className={r.id === "shipping" ? s.orange : s.blue}>
                   {r.id === "shipping" ? (
-                    <Truck size={32} />
+                    <Snowflake size={32} />
                   ) : (
                     <Ticket size={32} />
                   )}
@@ -151,7 +156,7 @@ export function Benefits() {
               <article key={r.id} className={s.couponRow}>
                 <span className={`${s.couponSymbol} ${s[r.theme]}`}>
                   {r.id === "shipping" ? (
-                    <Truck size={28} />
+                    <Snowflake size={28} />
                   ) : (
                     <Ticket size={28} />
                   )}
