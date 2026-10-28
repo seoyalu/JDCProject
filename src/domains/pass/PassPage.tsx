@@ -1,85 +1,47 @@
-import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  BookOpen,
-  CheckCircle2,
-  ChevronRight,
-  ShieldCheck,
-} from "lucide-react";
-import { missions } from "../missions/catalog";
-import { useCampus } from "../../app/state/CampusContext";
-import { MissionIcon } from "../missions/MissionIcon";
-import { number } from "../../shared/lib/format";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowRight, CheckCircle2, Map } from "lucide-react";
 import { PassCard } from "./PassCard";
+import { GrowthCard } from "../../shared/ui/Winter";
 import { PageHeading } from "../../shared/ui/PageHeading";
+import { useCampus } from "../../app/state/CampusContext";
+import { date } from "../../shared/lib/format";
 import s from "../../styles/App.module.css";
-
 export function Pass() {
   const { state } = useCampus();
+  const [params] = useSearchParams();
   return (
-    <div className={s.page}>
+    <div className={s.narrowPage}>
       <PageHeading
         eyebrow="MY CAMPUS PASS"
-        title="나의 제주를 담은 PASS"
-        description="대학생의 특별한 자격, 그리고 차곡차곡 쌓이는 여행의 기록."
+        title={
+          params.has("welcome")
+            ? "CAMPUS의 새 친구가 되었어요!"
+            : "나의 CAMPUS PASS"
+        }
+        description={
+          params.has("welcome")
+            ? "인증 완료! 500P가 지급되었어요. 이제 여행을 준비해 볼까요?"
+            : "대학생의 특별한 자격과 겨울 제주 이야기를 담았어요."
+        }
       />
-      <div className={s.passPageGrid}>
-        <section>
-          <PassCard />
-          <div className={s.passInfo}>
-            <span>
-              <ShieldCheck size={18} />
-              대학생 인증 완료
-            </span>
-            <p>제주대학교 · 김제디</p>
-            <small>체험 계정 · 인증 기간 2026.10.25 – 2027.10.24</small>
-          </div>
-          <div className={s.passBalance}>
-            <span>보유 포인트</span>
-            <strong>{number(state.points)}P</strong>
-            <Link to="/my?tab=points">
-              내역 보기 <ChevronRight size={14} />
-            </Link>
-          </div>
-        </section>
-        <section className={s.passport}>
-          <div className={s.passportHeader}>
-            <BookOpen size={25} />
-            <div>
-              <span className={s.eyebrow}>MY JEJU PASSPORT</span>
-              <h2>제디의 스탬프 여권</h2>
-            </div>
-            <strong>
-              {state.completed.length}
-              <small> / {missions.length}</small>
-            </strong>
-          </div>
-          <div className={s.stampGrid}>
-            {missions.map((m) => {
-              const done = state.completed.includes(m.id);
-              return (
-                <Link
-                  key={m.id}
-                  to={`/missions/${m.id}`}
-                  className={`${s.stampItem} ${done ? s.earnedStamp : ""}`}
-                >
-                  <span>
-                    <MissionIcon kind={m.kind} size={32} />
-                    {done && <CheckCircle2 size={18} />}
-                  </span>
-                  <strong>{m.stamp}</strong>
-                  <small>{done ? "수집 완료" : "미션으로 만나기"}</small>
-                </Link>
-              );
-            })}
-          </div>
-          <p className={s.passportNote}>
-            스탬프는 사용해도 사라지지 않는 나만의 제주 추억이에요.
-          </p>
-        </section>
-      </div>
+      <PassCard />
+      {state.verifiedAt && (
+        <p className={s.passValidity}>
+          <CheckCircle2 size={15} /> {date(state.verifiedAt)} 인증 · 1년간 유효
+          · 체험용
+        </p>
+      )}
+      <GrowthCard />
+      <Link className={s.mapCallout} to="/map">
+        <Map size={27} />
+        <div>
+          <h3>발자국은 지도에 남겨요</h3>
+          <p>다녀온 장소와 해녀몽이 스탬프를 확인하세요.</p>
+        </div>
+        <ArrowRight size={18} />
+      </Link>
       <Link to="/missions" className={s.primaryButton}>
-        다음 제주 이야기 만나기 <ArrowRight size={18} />
+        겨울방학 미션 만나보기 <ArrowRight size={17} />
       </Link>
     </div>
   );

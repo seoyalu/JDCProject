@@ -1,36 +1,44 @@
 import { useEffect, useState } from "react";
-import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import {
   ArrowRight,
   Bell,
-  Compass,
   Gift,
   Home,
+  Map,
+  Snowflake,
   UserRound,
-  Waves,
 } from "lucide-react";
 import { useCampus } from "./state/CampusContext";
 import { Modal } from "../shared/ui/Modal";
+import { Mong } from "../shared/ui/Winter";
 import { CampusHome } from "../domains/home/HomePage";
 import { MissionDetail } from "../domains/missions/MissionDetailPage";
 import { MissionComplete } from "../domains/missions/MissionCompletePage";
+import { Missions } from "../domains/missions/MissionsPage";
+import { CampusMap } from "../domains/map/MapPage";
 import { Benefits } from "../domains/benefits/BenefitsPage";
 import { Pass } from "../domains/pass/PassPage";
+import { Verify } from "../domains/pass/VerifyPage";
 import { MyCampus } from "../domains/profile/MyCampusPage";
 import { NotFound } from "../shared/ui/NotFound";
-import { Missions } from "../domains/missions/MissionsPage";
 import s from "../styles/App.module.css";
-
 const nav = [
-  { to: "/", label: "CAMPUS 홈", mobile: "홈", icon: Home },
-  { to: "/missions", label: "오늘의 미션", mobile: "미션", icon: Compass },
-  { to: "/benefits", label: "혜택 & 쿠폰", mobile: "혜택", icon: Gift },
-  { to: "/my", label: "마이 캠퍼스", mobile: "마이", icon: UserRound },
+  { to: "/", label: "홈", icon: Home },
+  { to: "/map", label: "제주 캠퍼스 지도", mobile: "지도", icon: Map },
+  { to: "/benefits", label: "CAMPUS 혜택", mobile: "혜택", icon: Gift },
+  { to: "/my", label: "MY", icon: UserRound },
 ];
-
 export function App() {
   const location = useLocation();
-  const { storageAvailable } = useCampus();
+  const { state, storageAvailable } = useCampus();
   const [notice, setNotice] = useState(false);
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -43,19 +51,14 @@ export function App() {
       <header className={s.header}>
         <div className={s.headerInner}>
           <Link to="/" className={s.brand} aria-label="JDC CAMPUS 홈">
-            <span className={s.brandMark}>
-              <Waves size={25} />
-            </span>
-            <span>
-              JDC <b>CAMPUS</b>
-              <small>JEJU DUTY FREE</small>
-            </span>
+            JDC <b>CAMPUS</b>
+            <i />
           </Link>
           <nav className={s.desktopNav} aria-label="주 메뉴">
             {nav.map((n) => (
               <NavLink
-                end={n.to === "/"}
                 key={n.to}
+                end={n.to === "/"}
                 to={n.to}
                 className={({ isActive }) => (isActive ? s.activeNav : "")}
               >
@@ -64,74 +67,85 @@ export function App() {
             ))}
           </nav>
           <div className={s.headerActions}>
-            <span className={s.demoBadge}>체험 서비스</span>
+            <span className={s.winterBadge}>
+              <Snowflake size={13} /> WINTER 2026
+            </span>
             <button
               className={s.iconButton}
               aria-label="알림 보기"
               onClick={() => setNotice(true)}
             >
               <Bell size={21} />
-              <i className={s.notificationDot} />
+              {state.notifications && <i className={s.notificationDot} />}
             </button>
-            <Link to="/my" className={s.avatar} aria-label="김제디 마이 캠퍼스">
-              제디
+            <Link to="/my" className={s.headerAvatar} aria-label="나의 CAMPUS">
+              <Mong alt="" />
             </Link>
           </div>
         </div>
       </header>
+      <div className={s.demoStrip}>
+        <Snowflake size={12} />
+        {state.clock === "season"
+          ? "겨울방학 체험 모드 · 2027.01.05"
+          : "실제 날짜로 보기"}
+        <Link to="/my?tab=settings">
+          체험 설정 <ArrowRight size={11} />
+        </Link>
+      </div>
       {!storageAvailable && (
         <div className={s.storageWarning} role="status">
-          브라우저 저장 공간을 사용할 수 없어 이번 체험은 새로고침하면
+          브라우저 저장 공간을 사용할 수 없어 새로고침하면 체험 기록이
           초기화됩니다.
         </div>
       )}
       <main id="main" className={s.main}>
         <Routes>
           <Route path="/" element={<CampusHome />} />
+          <Route path="/map" element={<CampusMap />} />
           <Route path="/missions" element={<Missions />} />
           <Route path="/missions/:id" element={<MissionDetail />} />
           <Route path="/missions/:id/complete" element={<MissionComplete />} />
           <Route path="/benefits" element={<Benefits />} />
           <Route path="/pass" element={<Pass />} />
+          <Route path="/verify" element={<Verify />} />
           <Route path="/my" element={<MyCampus />} />
+          <Route path="/passport" element={<Navigate to="/map" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <footer className={s.footer}>
-        <span>
-          <b>JDC CAMPUS</b> 제주에서 만나는 특별한 오늘
-        </span>
-        <span>발표용 프로토타입 · 포인트와 쿠폰은 체험용입니다.</span>
+        <b>JDC CAMPUS</b>
+        <span>겨울방학, 제주에서 시작하는 특별한 캠퍼스 라이프</span>
+        <small>발표용 체험 서비스 · 포인트·쿠폰·위치 인증은 데모입니다.</small>
       </footer>
       <nav className={s.mobileNav} aria-label="모바일 메뉴">
         {nav.map((n) => (
           <NavLink
-            end={n.to === "/"}
             key={n.to}
             to={n.to}
+            end={n.to === "/"}
             className={({ isActive }) => (isActive ? s.activeMobile : "")}
           >
-            <n.icon size={22} />
-            <span>{n.mobile}</span>
+            <n.icon size={21} />
+            <span>{n.mobile ?? n.label}</span>
           </NavLink>
         ))}
       </nav>
       {notice && (
-        <Modal title="CAMPUS 소식" onClose={() => setNotice(false)}>
-          <div className={s.noticeIcon}>
-            <Gift size={30} />
-          </div>
-          <h3>제디님, 제주에 오신 걸 환영해요!</h3>
+        <Modal title="겨울 CAMPUS 소식" onClose={() => setNotice(false)}>
+          <Mong className={s.modalMong} />
+          <h3>이번 겨울, 해녀몽이와 제주를 탐험해요!</h3>
           <p className={s.modalText}>
-            웰컴 포인트 300P를 준비했어요. 면세점 방문 미션에 참여하고 200P를 더
-            모아 무료배송 쿠폰으로 교환해 보세요.
+            대학생 인증으로 500P를 받고, 여행 전부터 나만의 제주 이야기를 시작해
+            보세요.
           </p>
           <Link
-            to="/missions/jdc-visit"
+            to={state.verifiedAt ? "/missions" : "/verify"}
             className={s.primaryButton}
             onClick={() => setNotice(false)}
           >
-            첫 미션 만나보기 <ArrowRight size={18} />
+            겨울방학 시작하기 <ArrowRight size={17} />
           </Link>
         </Modal>
       )}

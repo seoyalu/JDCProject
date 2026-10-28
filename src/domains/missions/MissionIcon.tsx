@@ -1,15 +1,30 @@
-import { Citrus, Leaf, Megaphone, Store } from "lucide-react";
+import {
+  BookOpen,
+  Gift,
+  Heart,
+  Leaf,
+  MapPin,
+  Plane,
+  Send,
+  Users,
+} from "lucide-react";
 import type { MissionKind } from "./catalog";
-
 export function MissionIcon({
   kind,
-  size = 25,
+  size = 24,
 }: {
   kind: MissionKind;
   size?: number;
 }) {
-  const Icon = { visit: Store, vote: Megaphone, eco: Leaf, local: Citrus }[
-    kind
-  ];
+  const Icon = {
+    bucket: BookOpen,
+    friend: Users,
+    wishlist: Gift,
+    taste: Heart,
+    arrival: Plane,
+    visit: MapPin,
+    eco: Leaf,
+    share: Send,
+  }[kind];
   return <Icon size={size} strokeWidth={1.8} aria-hidden="true" />;
 }

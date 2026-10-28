@@ -1,37 +1,42 @@
 import { Link } from "react-router-dom";
-import { Check, ChevronRight } from "lucide-react";
-import { useCampus } from "../../app/state/CampusContext";
-import { MissionIcon } from "./MissionIcon";
+import { CheckCircle2, ChevronRight, LockKeyhole } from "lucide-react";
 import type { Mission } from "./catalog";
+import { MissionIcon } from "./MissionIcon";
+import { useCampus } from "../../app/state/CampusContext";
+import { lockReason, missionStatus } from "../../app/state/campus";
 import s from "../../styles/App.module.css";
-
 export function MissionCard({ mission }: { mission: Mission }) {
   const { state } = useCampus();
-  const done = state.completed.includes(mission.id);
+  const status = missionStatus(state, mission);
+  const locked = ["잠금", "예정", "종료"].includes(status);
   return (
     <Link
       to={`/missions/${mission.id}`}
-      className={`${s.missionCard} ${s[mission.kind]}`}
+      className={`${s.missionCard} ${locked ? s.lockedCard : ""}`}
     >
-      <span className={s.missionIcon}>
+      <span className={`${s.missionIcon} ${s[mission.kind]}`}>
         <MissionIcon kind={mission.kind} />
       </span>
       <div className={s.missionBody}>
-        <div className={s.missionHeading}>
-          <h3>{mission.title}</h3>
-          <span className={s.points}>+{mission.points}P</span>
-        </div>
-        <p>{mission.short}</p>
-        <div className={s.progressRow}>
-          <span className={s.progress}>
-            <span style={{ width: done ? "100%" : "0%" }} />
+        <h3>{mission.title}</h3>
+        <p>{locked ? lockReason(state, mission) : mission.short}</p>
+        <div className={s.cardTags}>
+          <span className={mission.seasonal ? s.seasonTag : s.alwaysTag}>
+            {mission.seasonal ? "겨울방학 한정" : "상시"}
           </span>
-          <small>{done ? "1" : "0"} / 1</small>
+          <span className={s.rewardPill}>+{mission.points}P</span>
+          {status === "진행 중" && (
+            <span className={s.inProgressTag}>진행 중</span>
+          )}
         </div>
       </div>
-      <span className={done ? s.doneIcon : s.cardArrow}>
-        {done ? <Check size={18} /> : <ChevronRight size={20} />}
-      </span>
+      {status === "완료" ? (
+        <CheckCircle2 className={s.doneIcon} size={21} />
+      ) : locked ? (
+        <LockKeyhole className={s.lockIcon} size={18} />
+      ) : (
+        <ChevronRight className={s.cardArrow} size={19} />
+      )}
     </Link>
   );
 }

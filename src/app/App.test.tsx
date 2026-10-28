@@ -1,12 +1,12 @@
+// @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { App } from "./App";
 import { CampusProvider } from "./state/CampusContext";
-import { STORAGE_KEY } from "./state/campus";
-// @vitest-environment jsdom
-import userEvent from "@testing-library/user-event";
-
+import { campusReducer, initialState, STORAGE_KEY } from "./state/campus";
+import { SEASON } from "../domains/missions/catalog";
 function mount(path = "/") {
   return render(
     <MemoryRouter initialEntries={[path]}>
@@ -16,6 +16,7 @@ function mount(path = "/") {
     </MemoryRouter>,
   );
 }
+const stored = () => JSON.parse(localStorage.getItem(STORAGE_KEY)!);
 beforeEach(() => {
   localStorage.clear();
   vi.spyOn(window, "scrollTo").mockImplementation(() => {});
@@ -24,50 +25,112 @@ afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
 });
-
-describe("campus screen flows", () => {
-  it("completes a visit, exchanges a coupon, uses it, and restores it after remount", async () => {
+describe("winter campus screens", () => {
+  it("issues the pass through explicit demo consent and completes a pre-trip mission", async () => {
     const user = userEvent.setup();
-    mount("/missions/jdc-visit");
+    mount("/verify");
+    const submit = screen.getByRole("button", { name: /데모 인증하고 500P/ });
+    expect((submit as HTMLButtonElement).disabled).toBe(true);
+    await user.click(screen.getByRole("checkbox"));
+    await user.click(submit);
+    expect(stored().points).toBe(500);
     await user.click(
-      screen.getByRole("button", { name: /방문 인증 시작하기/ }),
+      screen.getByRole("link", { name: /겨울방학 미션 만나보기/ }),
     );
-    await user.click(screen.getByRole("button", { name: /데모 인증하기/ }));
+    await user.click(
+      screen.getByRole("link", { name: /나의 겨울 제주 버킷리스트/ }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: /미션 참여 시작하기/ }),
+    );
+    await user.click(
+      screen.getByRole("checkbox", { name: /성산일출봉에서 겨울 바다 보기/ }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: /계획 저장하고 100P/ }),
+    );
+    expect(stored().points).toBe(600);
+    expect(stored().xp).toBe(50);
+  });
+  it("keeps onsite authentication locked until arrival", () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(
+        campusReducer(initialState(), {
+          type: "verify",
+          enrollment: "재학",
+          at: SEASON.demoNow,
+        }),
+      ),
+    );
+    mount("/missions/seongsan");
     expect(
-      screen.getByRole("heading", { name: "제주와 한 걸음 더 가까워졌어요!" }),
-    ).toBeTruthy();
-    await user.click(
-      screen.getByRole("link", { name: /포인트로 혜택 만나기/ }),
+      (
+        screen.getByRole("button", {
+          name: "아직 참여할 수 없어요",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+    expect(
+      screen.queryByRole("button", { name: "QR 인증 체험하기" }),
+    ).toBeNull();
+  });
+  it("completes GPS arrival, restores state, and exchanges and uses a coupon", async () => {
+    const user = userEvent.setup();
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify(
+        campusReducer(initialState(), {
+          type: "verify",
+          enrollment: "휴학",
+          at: SEASON.demoNow,
+        }),
+      ),
     );
-    const coupon = screen
-      .getByRole("heading", { name: "무료배송 쿠폰" })
+    mount("/missions/airport");
+    await user.click(screen.getByRole("button", { name: "GPS 인증" }));
+    await user.click(screen.getByRole("button", { name: "GPS 인증 체험하기" }));
+    await user.click(
+      screen.getByRole("button", { name: "데모 인증 완료하기" }),
+    );
+    expect(stored().points).toBe(1000);
+    expect(stored().completed[0].method).toBe("gps");
+    cleanup();
+    mount("/benefits");
+    const row = screen
+      .getByRole("heading", { name: "JDC 면세점 10% 할인쿠폰" })
       .closest("article")!;
-    await user.click(within(coupon).getByRole("button", { name: /교환하기/ }));
+    await user.click(within(row).getByRole("button", { name: "교환하기" }));
     await user.click(screen.getByRole("button", { name: "500P로 교환하기" }));
     await user.click(screen.getByRole("button", { name: /내 쿠폰함 열기/ }));
     await user.click(screen.getByRole("button", { name: "사용 체험" }));
     await user.click(
       screen.getByRole("button", { name: "데모 사용 완료하기" }),
     );
+    expect(stored().points).toBe(500);
+    expect(stored().coupons[0].usedAt).toBeTruthy();
+    cleanup();
+    mount("/benefits?tab=wallet");
     expect(
       (screen.getByRole("button", { name: "사용 완료" }) as HTMLButtonElement)
         .disabled,
     ).toBe(true);
-    expect(JSON.parse(localStorage.getItem(STORAGE_KEY)!).points).toBe(0);
-    cleanup();
-    mount("/benefits?tab=wallet");
-    expect(screen.getByRole("button", { name: "사용 완료" })).toBeTruthy();
   });
-  it("requires a vote selection and saves the chosen option", async () => {
+  it("filters and searches the interactive map", async () => {
     const user = userEvent.setup();
-    mount("/missions/brand-vote");
-    const submit = screen.getByRole("button", { name: /투표하고 포인트 받기/ });
-    expect((submit as HTMLButtonElement).disabled).toBe(true);
-    await user.click(screen.getByRole("radio", { name: "뷰티 · 향수" }));
-    await user.click(submit);
+    mount("/map");
+    await user.type(
+      screen.getByRole("textbox", { name: "지도 장소 검색" }),
+      "성산",
+    );
     expect(
-      JSON.parse(localStorage.getItem(STORAGE_KEY)!).votes["brand-vote"],
-    ).toBe("뷰티 · 향수");
+      screen.getByRole("button", { name: "성산일출봉 · 잠금" }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: "제주국제공항 · 잠금" }),
+    ).toBeNull();
+    await user.click(screen.getByRole("button", { name: "성산일출봉 · 잠금" }));
+    expect(screen.getByRole("heading", { name: "성산일출봉" })).toBeTruthy();
   });
   it("supports modal escape and focus restoration", async () => {
     const user = userEvent.setup();
@@ -79,22 +142,14 @@ describe("campus screen flows", () => {
     expect(screen.queryByRole("dialog")).toBeNull();
     expect(document.activeElement).toBe(trigger);
   });
-  it("shows a fallback for unknown routes and incomplete mission result URLs", () => {
-    mount("/missions/jdc-visit/complete");
+  it("shows fallback pages and remains usable when storage is blocked", () => {
+    mount("/missions/airport/complete");
     expect(
       screen.getByRole("heading", {
         name: "이 페이지는 아직 제주 여행 중이에요",
       }),
     ).toBeTruthy();
     cleanup();
-    mount("/missing");
-    expect(
-      screen.getByRole("heading", {
-        name: "이 페이지는 아직 제주 여행 중이에요",
-      }),
-    ).toBeTruthy();
-  });
-  it("keeps the app usable when browser storage is blocked", () => {
     vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
       throw new Error("blocked");
     });
@@ -104,7 +159,7 @@ describe("campus screen flows", () => {
     mount("/missions");
     expect(screen.getByRole("status").textContent).toContain("저장 공간");
     expect(
-      screen.getByRole("heading", { name: "제주를 즐기는 작은 미션" }),
+      screen.getByRole("heading", { name: "나의 겨울방학 캠퍼스 미션" }),
     ).toBeTruthy();
   });
 });

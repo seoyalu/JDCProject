@@ -1,57 +1,56 @@
 import { useState } from "react";
-import { ShieldCheck } from "lucide-react";
-import { missions } from "./catalog";
-import { useCampus } from "../../app/state/CampusContext";
-import { Empty } from "../../shared/ui/Empty";
+import { Link } from "react-router-dom";
+import { ArrowRight, Snowflake } from "lucide-react";
+import { missions, SEASON } from "./catalog";
 import { MissionCard } from "./MissionCard";
+import { useCampus } from "../../app/state/CampusContext";
+import { hasCompleted } from "../../app/state/campus";
 import { PageHeading } from "../../shared/ui/PageHeading";
+import { Empty } from "../../shared/ui/Empty";
 import s from "../../styles/App.module.css";
-
 export function Missions() {
+  const [filter, setFilter] = useState("여행 전");
   const { state } = useCampus();
-  const [filter, setFilter] = useState("전체");
-  const items = missions.filter((m) =>
-    filter === "완료"
-      ? state.completed.includes(m.id)
-      : filter === "진행 중"
-        ? !state.completed.includes(m.id)
-        : filter === "추천"
-          ? m.recommended && !state.completed.includes(m.id)
-          : true,
+  const items = missions.filter(
+    (m) =>
+      filter === "전체" ||
+      (filter === "여행 전" && m.stage === "before") ||
+      (filter === "제주 현장" && m.stage === "onsite") ||
+      (filter === "여행 후" && m.stage === "after") ||
+      (filter === "완료" && hasCompleted(state, m.id)),
   );
   return (
     <div className={s.page}>
       <PageHeading
-        eyebrow="EXPLORE JEJU"
-        title="제주를 즐기는 작은 미션"
-        description="새로운 경험 하나, 쌓이는 혜택 하나. 제디와 함께 시작해요."
+        eyebrow="WINTER CAMPUS MISSIONS"
+        title="나의 겨울방학 캠퍼스 미션"
+        description="제주를 꿈꾸는 순간부터 나만의 여행을 준비해요."
       />
-      <div className={s.missionPageBanner}>
-        <span>
-          오늘의 제주가
-          <br />
-          <strong>내일의 추억이 되도록.</strong>
-        </span>
-        <p>미션을 완료하고 포인트와 스탬프를 모아보세요.</p>
+      <div className={s.seasonNotice}>
+        <Snowflake size={23} />
+        <div>
+          <strong>{SEASON.name}</strong>
+          <p>{SEASON.period}</p>
+        </div>
+        <Link to="/map">
+          지도로 탐험하기 <ArrowRight size={16} />
+        </Link>
       </div>
-      <div className={s.filterBar} aria-label="미션 필터">
-        {["전체", "진행 중", "완료", "추천"].map((f) => (
+      <div className={s.filterBar} aria-label="미션 단계 필터">
+        {["여행 전", "제주 현장", "여행 후", "완료", "전체"].map((f) => (
           <button
+            key={f}
             aria-pressed={filter === f}
             className={filter === f ? s.selectedFilter : ""}
             onClick={() => setFilter(f)}
-            key={f}
           >
             {f}
-            {f === "완료" && <small>{state.completed.length}</small>}
           </button>
         ))}
       </div>
       <div className={s.listMeta}>
-        <span>
-          {filter} 미션 <strong>{items.length}</strong>
-        </span>
-        <small>체험 기간 내 미션별 1회 참여</small>
+        {filter} 미션 <strong>{items.length}</strong>
+        <span>미션별 1회 참여</span>
       </div>
       <div className={s.missionPageGrid}>
         {items.map((m) => (
@@ -59,25 +58,10 @@ export function Missions() {
         ))}
       </div>
       {!items.length && (
-        <Empty
-          title={
-            filter === "완료"
-              ? "첫 번째 추억을 기다리고 있어요"
-              : "이곳의 미션을 모두 만나봤어요"
-          }
-        >
-          {filter === "완료"
-            ? "미션에 참여하면 완료한 활동이 이곳에 모여요."
-            : "전체 탭에서 다른 미션을 살펴보세요."}
+        <Empty title="아직 기록된 미션이 없어요">
+          여행 전 미션부터 시작해 보세요.
         </Empty>
       )}
-      <div className={s.infoBox}>
-        <ShieldCheck size={21} />
-        <p>
-          이곳은 발표용 체험 공간이에요. 현장 방문 대신{" "}
-          <strong>데모 인증</strong>으로 미션 흐름을 경험할 수 있어요.
-        </p>
-      </div>
     </div>
   );
 }

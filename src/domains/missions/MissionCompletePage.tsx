@@ -1,55 +1,114 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ArrowRight, Check, ChevronRight, Stamp } from "lucide-react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Copy,
+  Map,
+  Sparkles,
+  Stamp,
+} from "lucide-react";
 import { missions } from "./catalog";
 import { useCampus } from "../../app/state/CampusContext";
-import { MissionIcon } from "./MissionIcon";
-import { number } from "../../shared/lib/format";
+import { growth } from "../../app/state/campus";
+import { Mong } from "../../shared/ui/Winter";
 import { NotFound } from "../../shared/ui/NotFound";
+import { date, number } from "../../shared/lib/format";
 import s from "../../styles/App.module.css";
-
 export function MissionComplete() {
   const { id } = useParams();
   const { state } = useCampus();
+  const [copied, setCopied] = useState(false);
   const mission = missions.find((m) => m.id === id);
-  if (!mission || !state.completed.includes(mission.id)) return <NotFound />;
+  const record = state.completed.find((c) => c.missionId === id);
+  if (!mission || !record) return <NotFound />;
+  const g = growth(state.xp);
+  const summary = `나의 겨울 제주 이야기: ${record.answer ?? mission.title} · ${state.completed.length}개 미션 완료 · 해녀몽이 LV.${g.level}`;
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(summary);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
   return (
     <div className={s.successPage}>
-      <div className={s.successArtwork}>
-        <div className={s.successSeal}>
-          <Check size={49} />
-        </div>
-        <span className={s.confettiOne}>✦</span>
-        <span className={s.confettiTwo}>✦</span>
-        <span className={s.confettiThree}>●</span>
+      <div className={s.successArt}>
+        <Mong />
+        <span>✦</span>
+        <i>
+          <CheckCircle2 size={29} />
+        </i>
       </div>
-      <span className={s.eyebrow}>A LITTLE ADVENTURE, A BIG SMILE</span>
-      <h1>제주와 한 걸음 더 가까워졌어요!</h1>
-      <p>{mission.title} 미션을 완료했어요.</p>
-      <div className={s.earnedPoints}>
+      <span className={s.eyebrow}>ONE MORE WINTER MEMORY</span>
+      <h1>
+        {mission.stage === "onsite"
+          ? "해녀몽이가 이곳을 다녀왔어요!"
+          : "우리의 제주가 조금 더 가까워졌어요!"}
+      </h1>
+      <p>
+        {mission.title}
+        <br />
+        <small>{date(record.at)} 완료</small>
+      </p>
+      <strong className={s.earnedPoints}>
         +{mission.points}
-        <span>P</span>
-      </div>
-      <div className={s.newStamp}>
-        <span className={`${s.missionIcon} ${s[mission.kind]}`}>
-          <MissionIcon kind={mission.kind} />
-        </span>
+        <small>P</small>
+      </strong>
+      <div className={s.successRewards}>
         <div>
-          <small>새로운 스탬프 획득</small>
-          <strong>{mission.stamp}</strong>
+          <Stamp size={23} />
+          <span>
+            {mission.stamp}
+            <small>스탬프 1개 획득</small>
+          </span>
         </div>
-        <Stamp size={24} />
+        <div>
+          <Sparkles size={23} />
+          <span>
+            +{mission.xp}XP
+            <small>
+              LV.{g.level} {g.title}
+            </small>
+          </span>
+        </div>
       </div>
+      {mission.id === "airport" && (
+        <div className={s.unlockNotice}>
+          제주 현장 미션이 열렸어요!
+          <br />
+          <small>지도에서 다음 여행지를 선택해 보세요.</small>
+        </div>
+      )}
       <div className={s.balanceLine}>
-        현재 보유 포인트 <strong>{number(state.points)}P</strong>
+        현재 보유 포인트<strong>{number(state.points)}P</strong>
       </div>
-      <Link className={s.primaryButton} to="/benefits">
-        포인트로 혜택 만나기 <ArrowRight size={18} />
+      <Link
+        className={s.primaryButton}
+        to={mission.stage === "before" ? "/map" : `/map?place=${mission.id}`}
+      >
+        <Map size={18} />
+        {mission.stage === "before"
+          ? "제주에 가면 열리는 미션 보기"
+          : "지도에서 내 발자국 보기"}
+        <ArrowRight size={17} />
       </Link>
-      <Link className={s.secondaryButton} to="/pass">
-        나의 PASS와 스탬프 보기
+      <Link className={s.secondaryButton} to="/benefits">
+        포인트로 JDC 혜택 만나기
       </Link>
+      {mission.kind === "share" && (
+        <div className={s.shareSummary}>
+          <p>{summary}</p>
+          <button className={s.secondaryButton} onClick={copy}>
+            <Copy size={16} />
+            {copied ? "공유 문구를 복사했어요" : "공유 문구 복사"}
+          </button>
+          <small>복사가 안 되면 위 문구를 선택해서 복사해 주세요.</small>
+        </div>
+      )}
       <Link className={s.textLink} to="/missions">
-        다른 미션 둘러보기 <ChevronRight size={15} />
+        다른 시즌 미션 둘러보기 <ArrowRight size={14} />
       </Link>
     </div>
   );

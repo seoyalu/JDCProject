@@ -1,5 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap");
-
 :root {
   font-family:
     "Noto Sans KR",
@@ -7,18 +6,16 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  color: #172a46;
-  background: #f8fafc;
+  color: #102d51;
+  background: #f7fbff;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-weight: 400;
-  --blue: #0875df;
-  --navy: #102f63;
-  --orange: #ff782c;
-  --muted: #7a8799;
-  --border: #e9edf2;
+  --blue: #007feb;
+  --navy: #08275b;
+  --orange: #ff913d;
+  --border: #e2edf5;
+  --muted: #68839a;
 }
 * {
   box-sizing: border-box;
@@ -29,19 +26,19 @@ body {
 }
 button,
 input,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-button,
-input {
+select,
+textarea {
   font: inherit;
 }
 button,
 a {
+  -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
 button {
+  border: 0;
   cursor: pointer;
+  color: inherit;
 }
 button:disabled {
   cursor: not-allowed;
@@ -50,31 +47,35 @@ a {
   color: inherit;
   text-decoration: none;
 }
-button {
-  color: inherit;
-}
-button:focus-visible,
-a:focus-visible,
-input:focus-visible {
-  outline: 3px solid #ff9d56;
-  outline-offset: 4px;
-}
 h1,
 h2,
 h3,
 p {
   margin: 0;
 }
-button {
-  border: 0;
+img {
+  max-width: 100%;
 }
 svg {
-  flex-shrink: 0;
   vertical-align: middle;
+  flex-shrink: 0;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #ffad50;
+  outline-offset: 4px;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--blue);
 }
 ::selection {
-  background: #c6e8ff;
-  color: #10386b;
+  background: #c0e9ff;
+  color: #083b6d;
 }
 @media (prefers-reduced-motion: reduce) {
   *,

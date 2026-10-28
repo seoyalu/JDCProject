@@ -1,220 +1,143 @@
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  BookOpen,
   ChevronRight,
-  GraduationCap,
+  LockKeyhole,
   MapPin,
-  ShieldCheck,
-  ShoppingBag,
-  Sparkles,
-  Stamp,
-  Ticket,
-  Wallet,
+  Plane,
+  Snowflake,
 } from "lucide-react";
-import { missions } from "../missions/catalog";
+import { missions, SEASON } from "../missions/catalog";
 import { useCampus } from "../../app/state/CampusContext";
-import { MissionCard } from "../missions/MissionCard";
-import { number } from "../../shared/lib/format";
+import { currentTime, hasCompleted, isVerified } from "../../app/state/campus";
 import { PassCard } from "../pass/PassCard";
+import { MissionCard } from "../missions/MissionCard";
 import { SectionTitle } from "../../shared/ui/SectionTitle";
-import { ArrowUpRightIcon } from "./ArrowUpRightIcon";
 import s from "../../styles/App.module.css";
-
 export function CampusHome() {
   const { state } = useCampus();
-  const available = state.coupons.filter(
-    (c) => !c.usedAt && new Date(c.expiresAt) > new Date(),
-  ).length;
+  const verified = isVerified(state, currentTime(state));
+  const arrived = hasCompleted(state, "airport");
+  const available = missions.filter(
+    (m) => m.stage === "before" && !hasCompleted(state, m.id),
+  );
   return (
     <>
-      <section className={s.hero} aria-label="대학생을 위한 특별한 제주 경험">
+      <section className={s.hero}>
         <div className={s.heroCopy}>
           <span className={s.heroTag}>
-            <Sparkles size={14} /> 대학생을 위한 특별한 제주 경험
+            <Snowflake size={14} /> HELLO, WINTER CAMPUS
           </span>
           <h1>
-            제주를 더 가깝게,
+            겨울방학,
             <br />
-            오늘을 더 <span>특별하게.</span>
+            캠퍼스는 <em>제주.</em>
           </h1>
           <p>
-            제주를 즐기는 나만의 방법.
+            여행을 꿈꾸는 순간부터, 혜택이 되는 시간.
             <br />
-            미션으로 추억을 쌓고, 특별한 혜택을 만나보세요.
+            해녀몽이와 함께 특별한 겨울을 만나보세요.
           </p>
-          <Link to="/missions" className={s.heroButton}>
-            제디와 미션 시작하기 <ArrowRight size={17} />
+          <Link
+            to={verified ? "/missions" : "/verify"}
+            className={s.heroButton}
+          >
+            {verified ? "겨울방학 미션 둘러보기" : "대학생 인증하고 500P 받기"}
+            <ArrowRight size={17} />
           </Link>
-          <span className={s.heroCaption}>MY JEJU, MY CAMPUS</span>
+          <span className={s.heroPeriod}>{SEASON.period}</span>
         </div>
         <div className={s.heroSpeech}>
-          안녕! 나는 제디야 <span>함께 제주를 만나볼까?</span>
+          이번 겨울방학,
+          <br />
+          나랑 제주 탐험할래? <span>해녀몽이와 함께 떠나요!</span>
         </div>
-        <div className={s.heroLocation}>
-          <MapPin size={13} /> JEJU ISLAND, KOREA
-        </div>
+        <span className={s.heroLocation}>
+          <MapPin size={12} /> WINTER IN JEJU
+        </span>
       </section>
-      <section className={s.overview} aria-label="내 CAMPUS 현황">
-        <PassCard compact />
-        <div className={s.overviewStats}>
-          <div className={s.welcomeLine}>
-            <span>
-              반가워요, <strong>제디님!</strong>{" "}
-              <span className={s.waveEmoji}>✦</span>
-            </span>
-            <Link to="/my">
-              내 활동 보기 <ChevronRight size={14} />
-            </Link>
-          </div>
-          <div className={s.statsGrid}>
-            <Link to="/my?tab=points">
-              <span className={`${s.statIcon} ${s.orange}`}>
-                <Wallet size={22} />
-              </span>
-              <span className={s.statLabel}>보유 포인트</span>
-              <strong key={state.points} className={s.countUp}>
-                {number(state.points)}
-                <small>P</small>
-              </strong>
-            </Link>
-            <Link to="/pass">
-              <span className={`${s.statIcon} ${s.blue}`}>
-                <Stamp size={22} />
-              </span>
-              <span className={s.statLabel}>나의 스탬프</span>
-              <strong>
-                {state.completed.length}
-                <small>/ {missions.length}</small>
-              </strong>
-            </Link>
-            <Link to="/benefits?tab=wallet">
-              <span className={`${s.statIcon} ${s.green}`}>
-                <Ticket size={22} />
-              </span>
-              <span className={s.statLabel}>보유 쿠폰</span>
-              <strong>
-                {available}
-                <small>장</small>
-              </strong>
-            </Link>
-          </div>
-          <div className={s.nextTip}>
-            <Sparkles size={15} />
-            <span>
-              {state.completed.length
-                ? "차곡차곡 쌓이는 나만의 제주 이야기"
-                : "첫 미션을 완료하면 200P를 더 받을 수 있어요!"}
-            </span>
-            <Link
-              to={state.completed.length ? "/pass" : "/missions/jdc-visit"}
-              aria-label="추천 활동 확인"
-            >
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-      </section>
-      <div className={s.homeGrid}>
-        <section>
+      <div className={s.homeColumns}>
+        <aside className={s.homeAside}>
+          <PassCard />
+        </aside>
+        <div className={s.homeMissions}>
           <SectionTitle
-            eyebrow="LET’S EXPLORE"
-            title="오늘, 어떤 제주를 만날까요?"
+            eyebrow="BEFORE YOUR TRIP"
+            title="여행은, 이미 시작됐어요"
             to="/missions"
+            link="시즌 미션 전체"
           />
+          <p className={s.sectionDescription}>
+            제주에 가기 전에도 참여할 수 있어요.
+          </p>
           <div className={s.missionList}>
-            {missions.slice(0, 3).map((m) => (
-              <MissionCard key={m.id} mission={m} />
-            ))}
+            {(available.length
+              ? available
+              : missions.filter((m) => m.stage === "before")
+            )
+              .slice(0, 3)
+              .map((m) => (
+                <MissionCard key={m.id} mission={m} />
+              ))}
           </div>
-          <Link to="/pass" className={s.passportBanner}>
-            <span className={s.passportSymbol}>
-              <BookOpen size={30} />
-            </span>
+          <div className={s.sectionGap}>
+            <SectionTitle
+              eyebrow="NEXT STOP, JEJU"
+              title={
+                arrived
+                  ? "제주에서 만나는 새로운 경험"
+                  : "제주에 가면 열리는 미션"
+              }
+              to="/map"
+              link="지도 보기"
+            />
+          </div>
+          <Link to="/missions/airport" className={s.arrivalCard}>
             <span>
-              <strong>제주의 순간을 차곡차곡</strong>
-              <small>나만의 스탬프 여권을 채워보세요.</small>
-            </span>
-            <ArrowUpRightIcon />
-          </Link>
-        </section>
-        <section>
-          <SectionTitle
-            eyebrow="JUST FOR CAMPUS"
-            title="대학생이라 더 좋은 혜택"
-            to="/benefits"
-          />
-          <div className={s.featuredReward}>
-            <div className={s.rewardTopline}>
-              <span>WELCOME BENEFIT</span>
-              <Ticket size={24} />
-            </div>
-            <span className={s.rewardKicker}>제주에서 만난 설렘을 집까지</span>
-            <h3>
-              배송비는 <span>0원,</span>
-              <br />
-              즐거움은 그대로.
-            </h3>
-            <p>500P로 무료배송 쿠폰을 만나보세요.</p>
-            <Link to="/benefits?reward=shipping" className={s.rewardLink}>
-              쿠폰 교환하기 <ArrowRight size={17} />
-            </Link>
-            <div className={s.rewardDecoration}>
-              <ShoppingBag size={77} strokeWidth={1.2} />
-              <span>FOR YOU</span>
-            </div>
-          </div>
-          <div className={s.smallBenefit}>
-            <span className={`${s.statIcon} ${s.orange}`}>
-              <GraduationCap size={25} />
+              <Plane size={25} />
             </span>
             <div>
-              <strong>대학생의 제주, 더 특별하게</strong>
-              <p>인증된 대학생만을 위한 CAMPUS 혜택</p>
+              <h3>
+                {arrived ? "제주 도착 인증 완료!" : "제주공항에 도착하셨나요?"}
+              </h3>
+              <p>
+                {arrived
+                  ? "해녀몽이와 현장 미션을 탐험해요"
+                  : "도착을 인증하고 현장 미션을 열어보세요"}
+              </p>
             </div>
-            <ShieldCheck size={20} />
-          </div>
-          <Link to="/missions/brand-vote" className={s.voteBanner}>
-            <span>YOUR PICK, OUR NEXT</span>
-            <strong>다음에 만나고 싶은 브랜드는?</strong>
-            <p>
-              취향을 알려주고 50P 받기 <ArrowRight size={15} />
-            </p>
+            <b>{arrived ? "완료" : "+500P"}</b>
+            <ChevronRight size={17} />
           </Link>
-        </section>
-      </div>
-      <section className={s.steps}>
-        <div>
-          <span className={s.eyebrow}>HOW TO CAMPUS</span>
-          <h2>즐기는 만큼, 혜택이 되는 제주</h2>
+          <div className={s.placePreview}>
+            {["seongsan", "dongmun"].map((id) => {
+              const m = missions.find((m) => m.id === id)!;
+              return (
+                <Link key={id} to={`/missions/${id}`}>
+                  <div
+                    className={`${s.placeThumb} ${id === "dongmun" ? s.marketThumb : ""}`}
+                  >
+                    {!arrived && (
+                      <span>
+                        <LockKeyhole size={17} />
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <h3>{m.location}</h3>
+                    <p>
+                      {arrived
+                        ? "지금 참여할 수 있어요"
+                        : "제주 도착 후 참여 가능"}
+                    </p>
+                    <strong>+{m.points}P</strong>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
         </div>
-        <ol>
-          <li>
-            <span>01</span>
-            <p>
-              마음에 드는
-              <br />
-              <strong>미션을 찾고</strong>
-            </p>
-          </li>
-          <li>
-            <span>02</span>
-            <p>
-              제주를 즐기며
-              <br />
-              <strong>포인트를 모으고</strong>
-            </p>
-          </li>
-          <li>
-            <span>03</span>
-            <p>
-              나를 위한
-              <br />
-              <strong>혜택으로 바꿔요</strong>
-            </p>
-          </li>
-        </ol>
-      </section>
+      </div>
     </>
   );
 }
